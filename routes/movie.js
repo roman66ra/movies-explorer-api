@@ -10,7 +10,7 @@ router.post('/movies', celebrate({
   body: Joi.object().keys({
     country: Joi.string(),
     director: Joi.string(),
-    duration: Joi.string(),
+    duration: Joi.number(),
     year: Joi.number(),
     description: Joi.string(),
     image: Joi.string().pattern(/^(http|https|ftp):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)/i),

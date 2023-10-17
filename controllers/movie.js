@@ -7,7 +7,10 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getMovies = (req, res, next) => {
   Movie.find({})
-    .then((movie) => res.status(httpConstants.HTTP_STATUS_OK).send(movie))
+    .then((movie) => {
+      if
+      (movie.owner === req.user._id) { res.status(httpConstants.HTTP_STATUS_OK).send(movie); }
+    })
     .catch(next);
 };
 

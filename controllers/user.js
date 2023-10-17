@@ -11,9 +11,9 @@ const ConflictError = require('../errors/ConflictError');
 const { SECRET_KEY = 'secret_key' } = process.env;
 
 module.exports.getUser = (req, res, next) => {
-  User.find({})
-    .then((user) => { res.status(httpConstants.HTTP_STATUS_OK).send(user); })
-    .catch((error) => next(error));
+  User.findById(req.user._id)
+    .then((user) => res.status(httpConstants.HTTP_STATUS_OK).send(user))
+    .catch(next);
 };
 
 module.exports.postUser = (req, res, next) => {
@@ -39,6 +39,19 @@ module.exports.postUser = (req, res, next) => {
     });
 };
 
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 module.exports.patchUser = (req, res, next) => {
   const { name, email } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
@@ -52,18 +65,5 @@ module.exports.patchUser = (req, res, next) => {
       } else {
         next(error);
       }
-    });
-};
-
-module.exports.login = (req, res, next) => {
-  const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
-    .then((user) => {
-      const token = jwt.sign({ _id: user._id }, SECRET_KEY, { expiresIn: '7d' });
-      res.send({ token });
-    })
-    .catch((err) => {
-      next(err);
     });
 };
